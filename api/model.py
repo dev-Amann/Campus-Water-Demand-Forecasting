@@ -72,7 +72,11 @@ def train_model():
     full_predictions = model.predict(X)
     
     # Save the model
-    joblib.dump(model, MODEL_FILE)
+    try:
+        joblib.dump(model, MODEL_FILE)
+    except OSError:
+        # Vercel AWS Lambda read-only fallback
+        joblib.dump(model, '/tmp/model.pkl')
     
     return {
         'mae': mae,
@@ -84,8 +88,13 @@ def train_model():
 
 def get_model():
     if not os.path.exists(MODEL_FILE):
-        train_model()
-    return joblib.load(MODEL_FILE)
+        return train_model()
+    try:
+        return joblib.load(MODEL_FILE)
+    except Exception as e:
+        # Catch scikit-learn version mismatches and retrain dynamically
+        print(f"Version mismatch or load failure, retraining: {e}")
+        return train_model()
 
 def predict_single(temp, rainfall, occupancy, event, month, day_num):
     model = get_model()

@@ -17,7 +17,7 @@ def handle_exception(e):
     }), 500
 
 # Background train on startup if model not present
-get_model()
+
 
 @app.route('/api/dashboard', methods=['GET'])
 def get_dashboard_data():

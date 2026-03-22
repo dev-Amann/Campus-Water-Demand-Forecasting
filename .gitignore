@@ -1,0 +1,9 @@
+node_modules/
+/backend/venv/
+backend/__pycache__/
+*.pkl
+.env
+.DS_Store
+dist/
+dist-ssr/
+*.local

@@ -6,3 +6,4 @@ api/__pycache__/
 dist/
 dist-ssr/
 *.local
+__pycache__/

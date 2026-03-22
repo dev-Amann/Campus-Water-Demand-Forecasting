@@ -4,8 +4,17 @@ from flask_cors import CORS
 from model import load_data, preprocess_data, train_model, predict_single, get_model
 import numpy as np
 
+import traceback
 app = Flask(__name__)
 CORS(app)
+
+@app.errorhandler(Exception)
+def handle_exception(e):
+    return jsonify({
+        'error': str(e),
+        'type': type(e).__name__,
+        'traceback': traceback.format_exc()
+    }), 500
 
 # Background train on startup if model not present
 get_model()

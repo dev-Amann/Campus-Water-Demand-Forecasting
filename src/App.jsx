@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Link, useLocation } from 'react-router-dom';
-import { Droplets, TrendingUp, BarChart3, Activity, Menu, X, BookOpen, LineChart } from 'lucide-react';
+import { Droplets, TrendingUp, BarChart3, Activity, Menu, X, BookOpen, LineChart, Sparkles } from 'lucide-react';
 import Dashboard from './components/Dashboard';
 import Predictor from './components/Predictor';
 import Insights from './components/Insights';
@@ -89,6 +89,13 @@ const Navbar = () => {
 };
 
 const App = () => {
+  const [showNotification, setShowNotification] = useState(false);
+
+  useEffect(() => {
+    const timer = setTimeout(() => setShowNotification(true), 1500);
+    return () => clearTimeout(timer);
+  }, []);
+
   return (
     <Router>
       <div className="app-container top-nav">
@@ -104,6 +111,24 @@ const App = () => {
             <Route path="/docs" element={<Docs />} />
           </Routes>
         </main>
+
+        {/* Backend Status Notification */}
+        <div className={`status-notification ${showNotification ? 'active' : ''}`}>
+          <div className="status-icon">
+            <Sparkles size={22} className="text-yellow-400" />
+          </div>
+          <div className="status-content">
+            <h4><span className="status-glow"></span>System Initialization</h4>
+            <p>Our backend is hosted on Render. It may take 30-60s to wake up if inactive. Please wait...</p>
+          </div>
+          <button 
+            className="close-notification" 
+            onClick={() => setShowNotification(false)}
+            aria-label="Close notification"
+          >
+            <X size={16} />
+          </button>
+        </div>
 
         <footer className="footer-main">
           <div className="container" style={{textAlign: 'center', padding: '3rem 0', borderTop: '1px solid var(--border)'}}>

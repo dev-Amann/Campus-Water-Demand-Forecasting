@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { LineChart, Line, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, Legend } from 'recharts';
+import { LineChart, Line, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, Legend, Brush } from 'recharts';
 import { Droplets, AlertTriangle, CheckCircle, Zap } from 'lucide-react';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
@@ -97,9 +97,9 @@ const Dashboard = () => {
       <div className="charts-grid">
         <div className="glass-card chart-container">
           <h3 style={{marginBottom: '1.5rem', fontSize: '1.25rem'}}>Actual vs Predicted Demand Over Time</h3>
-          <div className="chart-scroll-area" style={{width: '100%', height: '310px', overflowX: 'auto', overflowY: 'hidden', paddingBottom: '8px'}}>
+          <div style={{width: '100%', height: '310px'}}>
             <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={data.slice(0, 50)} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
+              <AreaChart data={data.slice(0, 150)} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                 <defs>
                   <linearGradient id="colorUsage" x1="0" y1="0" x2="0" y2="1">
                     <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.8}/>
@@ -111,12 +111,13 @@ const Dashboard = () => {
                   </linearGradient>
                 </defs>
                 <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" />
-                <XAxis dataKey="Date" stroke="var(--text-muted)" tick={{fontSize: 12}} />
-                <YAxis stroke="var(--text-muted)" tick={{fontSize: 12}} />
+                <XAxis dataKey="Date" stroke="var(--text-muted)" tick={{fontSize: 10}} />
+                <YAxis stroke="var(--text-muted)" tick={{fontSize: 10}} />
                 <Tooltip content={<CustomTooltip />} />
                 <Legend />
                 <Area type="monotone" dataKey="Water_Usage_Liters" name="Actual Usage" stroke="#3b82f6" fillOpacity={1} fill="url(#colorUsage)" />
                 <Area type="monotone" dataKey="Predicted_Usage" name="Predicted Demand" stroke="#10b981" fillOpacity={1} fill="url(#colorPredicted)" />
+                <Brush dataKey="Date" height={30} stroke="var(--primary)" fill="var(--bg-card)" startIndex={0} endIndex={30} />
               </AreaChart>
             </ResponsiveContainer>
           </div>
@@ -124,15 +125,16 @@ const Dashboard = () => {
 
         <div className="glass-card chart-container">
           <h3 style={{marginBottom: '1.5rem', fontSize: '1.25rem'}}>Usage vs Temperature</h3>
-          <div className="chart-scroll-area" style={{width: '100%', height: '310px', overflowX: 'auto', overflowY: 'hidden', paddingBottom: '8px'}}>
+          <div style={{width: '100%', height: '310px'}}>
             <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={data.slice().sort((a,b)=>a.Temperature_C - b.Temperature_C).slice(0, 50)}>
+              <LineChart data={data.slice().sort((a,b)=>a.Temperature_C - b.Temperature_C).slice(0, 150)} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" />
-                <XAxis dataKey="Temperature_C" name="Temp(C)" stroke="var(--text-muted)" />
-                <YAxis stroke="var(--text-muted)" />
+                <XAxis dataKey="Temperature_C" name="Temp(C)" stroke="var(--text-muted)" tick={{fontSize: 10}} />
+                <YAxis stroke="var(--text-muted)" tick={{fontSize: 10}} />
                 <Tooltip content={<CustomTooltip />} />
                 <Legend />
                 <Line type="monotone" dataKey="Water_Usage_Liters" name="Water Usage" stroke="#8b5cf6" strokeWidth={3} dot={false} />
+                <Brush dataKey="Temperature_C" height={20} stroke="var(--accent)" fill="var(--bg-card)" startIndex={0} endIndex={40} />
               </LineChart>
             </ResponsiveContainer>
           </div>
@@ -140,9 +142,9 @@ const Dashboard = () => {
 
         <div className="glass-card chart-container" style={{gridColumn: '1 / -1'}}>
           <h3 style={{marginBottom: '1.5rem', fontSize: '1.25rem'}}>Monthly Campus Water Demand (2025)</h3>
-          <div className="chart-scroll-area" style={{width: '100%', height: '310px', overflowX: 'auto', overflowY: 'hidden', paddingBottom: '8px'}}>
+          <div style={{width: '100%', height: '310px'}}>
             <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={monthlyData} margin={{ top: 10, right: 30, left: 20, bottom: 5 }}>
+              <LineChart data={monthlyData} margin={{ top: 10, right: 10, left: -10, bottom: 5 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" />
                 <XAxis dataKey="Month" stroke="var(--text-muted)" tickFormatter={(val) => ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'][val - 1] || val} />
                 <YAxis stroke="var(--text-muted)" domain={['dataMin - 100000', 'dataMax + 100000']} tickFormatter={(val) => `${(val / 1000).toLocaleString()}k`} />
@@ -157,17 +159,18 @@ const Dashboard = () => {
 
         <div className="glass-card chart-container" style={{gridColumn: '1 / -1'}}>
           <h3 style={{marginBottom: '1.5rem', fontSize: '1.25rem'}}>Occupancy & Events Impact</h3>
-          <div className="chart-scroll-area" style={{width: '100%', height: '310px', overflowX: 'auto', overflowY: 'hidden', paddingBottom: '8px'}}>
+          <div style={{width: '100%', height: '310px'}}>
             <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={data.filter(d => d.Event !== 'None').slice(0, 30)} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
+              <BarChart data={data.filter(d => d.Event !== 'None').slice(0, 50)} margin={{ top: 20, right: 10, left: -10, bottom: 5 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" />
-                <XAxis dataKey="Event" stroke="var(--text-muted)" />
-                <YAxis yAxisId="left" stroke="var(--text-muted)" tickFormatter={(val) => `${(val / 1000).toLocaleString()}k`} />
-                <YAxis yAxisId="right" orientation="right" stroke="#6366f1" />
+                <XAxis dataKey="Event" stroke="var(--text-muted)" tick={{fontSize: 10}} />
+                <YAxis yAxisId="left" stroke="var(--text-muted)" tickFormatter={(val) => `${(val / 1000).toLocaleString()}k`} tick={{fontSize: 10}} />
+                <YAxis yAxisId="right" orientation="right" stroke="#6366f1" tick={{fontSize: 10}} />
                 <Tooltip content={<CustomTooltip />} />
                 <Legend />
                 <Bar yAxisId="left" dataKey="Water_Usage_Liters" name="Water Usage (Liters)" fill="#ec4899" radius={[4,4,0,0]} />
                 <Bar yAxisId="right" dataKey="Occupancy" name="Campus Occupancy (People)" fill="#6366f1" radius={[4,4,0,0]} />
+                <Brush dataKey="Event" height={30} stroke="#ec4899" fill="var(--bg-card)" startIndex={0} endIndex={10} />
               </BarChart>
             </ResponsiveContainer>
           </div>

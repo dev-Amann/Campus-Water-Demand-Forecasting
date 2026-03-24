@@ -112,42 +112,43 @@ const Predictor = () => {
         </div>
 
         {result && (
-          <div className="glass-card flex flex-col justify-center" style={{padding: '3rem 2rem', border: '2px solid var(--primary)'}}>
-            <h3 style={{marginBottom: '1rem', color: 'var(--primary)', textAlign: 'center'}}>Prediction Result</h3>
+          <div className="glass-card result-card-highlight">
+            <div className="result-header">
+              <Activity className="text-primary" size={24} />
+              <h3>Analysis Report</h3>
+            </div>
             
-            <div style={{textAlign: 'center', marginBottom: '2rem'}}>
-              <p style={{fontSize: '1rem', color: 'var(--text-muted)'}}>Estimated Water Demand</p>
-              <p style={{fontSize: '3rem', fontWeight: '800', color: 'white', textShadow: '0 0 20px rgba(59,130,246,0.5)'}}>
-                {formatNumber(result.prediction)} <span style={{fontSize: '1.5rem'}}>L</span>
-              </p>
+            <div className="prediction-main">
+              <span className="prediction-label">Estimated Water Demand</span>
+              <div className="prediction-value-wrapper">
+                <span className="prediction-number">{formatNumber(result.prediction)}</span>
+                <span className="prediction-unit">Liters</span>
+              </div>
             </div>
 
-            <div style={{background: 'rgba(16, 185, 129, 0.1)', padding: '1.5rem', borderRadius: '1rem'}}>
-              <h4 style={{color: 'var(--accent)', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem'}}>
-                <Activity /> Impact Calculation
-              </h4>
-              <div style={{display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem', borderBottom: '1px solid rgba(255,255,255,0.05)', paddingBottom: '0.5rem'}}>
-                <span style={{color: 'var(--text-muted)'}}>Unoptimized Baseline:</span>
-                <span className="font-bold">{formatNumber(result.baseline)} L</span>
+            <div className="impact-stats-container">
+              <div className="stat-row">
+                <span className="stat-label">Unoptimized Baseline</span>
+                <span className="stat-value">{formatNumber(result.baseline)} L</span>
               </div>
-              <div style={{display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem', borderBottom: '1px solid rgba(255,255,255,0.05)', paddingBottom: '0.5rem'}}>
-                <span style={{color: 'var(--text-muted)'}}>Potential Water Saved:</span>
-                <span className="font-bold" style={{color: 'var(--accent)'}}>{formatNumber(result.water_saved)} L</span>
+              <div className="stat-row highlight-stat">
+                <span className="stat-label">Potential Water Saved</span>
+                <span className="stat-value text-accent">-{formatNumber(result.water_saved)} L</span>
               </div>
-              <div style={{display: 'flex', justifyContent: 'space-between'}}>
-                <span style={{color: 'var(--text-muted)'}}>Est. Energy Saved:</span>
-                <span className="font-bold" style={{color: '#f59e0b'}}>{parseFloat(result.energy_saved).toFixed(2)} kWh</span>
+              <div className="stat-row">
+                <span className="stat-label">Est. Energy Saved</span>
+                <span className="stat-value text-yellow-400">-{parseFloat(result.energy_saved).toFixed(2)} kWh</span>
               </div>
             </div>
             
-            <div style={{marginTop: '1.5rem', fontSize: '0.85rem', color: 'var(--text-muted)', textAlign: 'center'}}>
-              <p>* Reducing unnecessary pumping prevents premature pump wear and saves electricity.</p>
-              <p style={{marginTop: '0.75rem', textAlign: 'left', padding: '0.75rem', background: 'rgba(255,255,255,0.05)', borderRadius: '0.5rem', borderLeft: '3px solid var(--primary)'}}>
-                💡 <strong>Base Load Note:</strong> Even at 0 occupancy, the model will predict a large baseline water demand (~115k Liters) because the campus requires massive amounts of water for empty facility maintenance, landscaping irrigation, and HVAC cooling towers.
-              </p>
-              <p style={{marginTop: '0.75rem', textAlign: 'left', padding: '0.75rem', background: 'rgba(255,255,255,0.05)', borderRadius: '0.5rem', borderLeft: '3px solid var(--accent)'}}>
-                📊 <strong>Event Impact Note:</strong> Notice how toggling "Special Event" barely changes the prediction? The ML model successfully proved that Temperature and Occupancy dominate the water consumption matrix, rendering individual events statistically insignificant in the grand scheme of campus operations!
-              </p>
+            <div className="predictor-notes">
+              <div className="note-card info">
+                <p><strong>💡 Base Load:</strong> Even at 0 occupancy, ~115k L is required for facility maintenance and landscaping.</p>
+              </div>
+              <div className="note-card highlight">
+                <p><strong>📊 Variable Impact:</strong> Model proves Temp and Occupancy dominate demand, while individual Events show minor statistical impact.</p>
+              </div>
+              <p className="disclaimer-text">* Accurate forecasting prevents pump wear and reduces campus energy footprint.</p>
             </div>
           </div>
         )}

@@ -81,6 +81,39 @@ def run_prediction():
     except Exception as e:
         return jsonify({'success': False, 'error': str(e)}), 400
 
+@app.route('/api/analysis', methods=['GET'])
+def get_analysis_data():
+    df = load_data()
+    _, _, full_df = preprocess_data(df)
+    
+    # Calculate Correlations
+    cols_of_interest = ['Water_Usage_Liters', 'Temperature_C', 'Rainfall_mm', 'Occupancy', 'Event']
+    corr_matrix = full_df[cols_of_interest].corr()['Water_Usage_Liters'].to_dict()
+    
+    # Usage Distribution (Histogram Bins)
+    counts, bin_edges = np.histogram(full_df['Water_Usage_Liters'], bins=10)
+    distribution = []
+    for i in range(len(counts)):
+        label = f"{int(bin_edges[i]/1000)}k-{int(bin_edges[i+1]/1000)}k"
+        distribution.append({'range': label, 'count': int(counts[i])})
+        
+    # Statistical Summary
+    stats = {
+        'mean': float(full_df['Water_Usage_Liters'].mean()),
+        'median': float(full_df['Water_Usage_Liters'].median()),
+        'std': float(full_df['Water_Usage_Liters'].std()),
+        'var': float(full_df['Water_Usage_Liters'].var()),
+        'min': float(full_df['Water_Usage_Liters'].min()),
+        'max': float(full_df['Water_Usage_Liters'].max()),
+        'total_records': int(len(full_df))
+    }
+    
+    return jsonify({
+        'correlations': corr_matrix,
+        'distribution': distribution,
+        'statistics': stats
+    })
+
 @app.route('/api/model_stats', methods=['GET'])
 def model_stats():
     # To get fresh stats, we retrain
